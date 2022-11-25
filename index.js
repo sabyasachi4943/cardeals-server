@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -52,13 +53,23 @@ async function run() {
       const query = { email: email };
       const user = await usersCollection.findOne(query);
       if (user) {
-        const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, {
+        const token = jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, {
           expiresIn: "1h",
         });
         return res.send({ accessToken: token });
       }
       res.status(403).send({ accessToken: "" });
     });
+
+
+    // find all cars in category
+    app.get("/category/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { typecode: id }
+      const result = await carsCollection.find(query).toArray();
+      res.send(result);
+    })
+
 
     // insert users
     app.post("/users", async (req, res) => {
