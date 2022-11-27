@@ -47,6 +47,7 @@ async function run() {
 
     const carsCollection = client.db("cardeals").collection("cars");
     const usersCollection = client.db("cardeals").collection("users");
+    const ordersCollection = client.db("cardeals").collection("orders");
 
     app.get("/jwt", async (req, res) => {
       const email = req.query.email;
@@ -69,6 +70,29 @@ async function run() {
       const result = await carsCollection.find(query).toArray();
       res.send(result);
     })
+
+
+    
+    // orders
+    app.post("/orders", async (req, res) => {
+      const buyerOrder = req.body;
+      console.log(buyerOrder);
+      const query = {
+        orderCarId: buyerOrder.orderCarId,
+        buyerEmail: buyerOrder.buyerEmail,
+        carName: buyerOrder.carName,
+      };
+
+      const alreadyOrdered = await ordersCollection.find(query).toArray();
+
+      if (alreadyOrdered.length) {
+        const message = `You ${buyerOrder.buyerEmail} already have ordered ${buyerOrder.carName}`;
+        return res.send({ acknowledged: false, message });
+      }
+
+      const result = await ordersCollection.insertOne(buyerOrder);
+      res.send(result);
+    });
 
 
     // insert users
