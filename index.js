@@ -113,7 +113,7 @@ async function run() {
       const users = await usersCollection.find(query).toArray();
       res.send(users);
     });
-    
+
     // insert users
     app.post("/users", async (req, res) => {
       const user = req.body;
@@ -121,6 +121,23 @@ async function run() {
       // TODO: make sure you do not enter duplicate user email
       // only insert users if the user doesn't exist in the database
       const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
+    app.put("/users/admin/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          role: "admin",
+        },
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updatedDoc,
+        options,
+      );
       res.send(result);
     });
     
