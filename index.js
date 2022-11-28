@@ -108,6 +108,11 @@ async function run() {
 
 
     // get all users
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const users = await usersCollection.find(query).toArray();
+      res.send(users);
+    });
     
     // insert users
     app.post("/users", async (req, res) => {
