@@ -71,8 +71,20 @@ async function run() {
       res.send(result);
     })
 
+    // get orders by email
+    app.get("/orders", async (req, res) => {
+      const email = req.query.email;
+      // const decodedEmail = req.decoded.email;
 
-    
+      // if (email !== decodedEmail) {
+      //   return res.status(403).send({ message: "forbidden access" });
+      // }
+
+      const query = { buyerEmail: email };
+      const orders = await ordersCollection.find(query).toArray();
+      res.send(orders);
+    });
+
     // orders
     app.post("/orders", async (req, res) => {
       const buyerOrder = req.body;
@@ -95,6 +107,8 @@ async function run() {
     });
 
 
+    // get all users
+    
     // insert users
     app.post("/users", async (req, res) => {
       const user = req.body;
