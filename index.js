@@ -64,9 +64,9 @@ async function run() {
 
 
     // find all cars in category
-    app.get("/category/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { typecode: id }
+    app.get("/category/:type", async (req, res) => {
+      const type = req.params.type;
+      const query = { type: type };
       const result = await carsCollection.find(query).toArray();
       res.send(result);
     })
@@ -114,6 +114,14 @@ async function run() {
       res.send(users);
     });
 
+    // get buyers
+    app.get("/buyers", async (req, res) => {
+      const query = { role: "buyer"};
+      const buyers = await usersCollection.find(query).toArray();
+      res.send(buyers);
+    });
+
+    
     // insert users
     app.post("/users", async (req, res) => {
       const user = req.body;
@@ -124,6 +132,7 @@ async function run() {
       res.send(result);
     });
 
+
     // seller check
     app.get("/users/seller/:email", async (req, res) => {
       const email = req.params.email;
@@ -132,7 +141,19 @@ async function run() {
       res.send({ isSeller: user?.role === "seller" });
     });
 
-  
+    // seller inserting products
+    app.post("/products", verifyJWT, async (req, res) => {
+      const car = req.body;
+      const result = await carsCollection.insertOne(car);
+      res.send(result);
+    });
+    // sellers my product
+    app.get("/products", async (req, res) => {
+      const name = req.query.name;
+      const query = { sellerName: name };
+      const result = await carsCollection.find(query).toArray();
+      res.send(result);
+    });
 
 
     // admin check
