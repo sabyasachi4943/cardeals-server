@@ -121,7 +121,20 @@ async function run() {
       res.send(buyers);
     });
 
+    app.get("/sellers", async (req, res) => {
+      const query = { role: "seller"};
+      const sellers = await usersCollection.find(query).toArray();
+      res.send(sellers);
+    });
+
     app.delete("/buyers/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    app.delete("/sellers/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const result = await usersCollection.deleteOne(filter);
@@ -187,6 +200,35 @@ async function run() {
       res.send(result);
     });
     
+
+    // ads items
+    app.get("/ads", verifyJWT, async (req, res) => {
+      const query = {
+        advertised: "advertised",
+      };
+      const advertisedCars = await carsCollection.find(query).toArray();
+      res.send(advertisedCars);
+    });
+
+   
+    // advertise products
+    app.put("/ads/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          advertised: "advertised",
+        },
+      };
+      const result = await carsCollection.updateOne(
+        filter,
+        updatedDoc,
+        options,
+      );
+      res.send(result);
+    });
+
   } finally {
     
   }
