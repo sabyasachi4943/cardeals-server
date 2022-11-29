@@ -121,7 +121,13 @@ async function run() {
       res.send(buyers);
     });
 
-    
+    app.delete("/buyers/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result);
+    });
+
     // insert users
     app.post("/users", async (req, res) => {
       const user = req.body;
